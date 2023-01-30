@@ -5,26 +5,26 @@ import java.util.Queue;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public class Monkey<T extends Number> {
-    private final Queue<T> items;
-    private final UnaryOperator<T> worryOperation;
-    private final UnaryOperator<T> afterInspectWorryOperation;
-    private final Function<T, Integer> throwToNextOperation;
-    private final Collection<ThrowListener<T>> throwListeners = new ArrayList<>();
+public class Monkey<WorryType> {
+    private final Queue<WorryType> items;
+    private final UnaryOperator<WorryType> worryOperation;
+    private final UnaryOperator<WorryType> afterInspectWorryOperation;
+    private final Function<WorryType, Integer> throwToNextOperation;
+    private final Collection<ThrowListener<WorryType>> throwListeners = new ArrayList<>();
     private int itemInspectCount = 0;
 
-    public Monkey(Queue<T> items, UnaryOperator<T> worryOperation, UnaryOperator<T> afterInspectWorryOperation, Function<T, Integer> throwToNextOperation) {
+    public Monkey(Queue<WorryType> items, UnaryOperator<WorryType> worryOperation, UnaryOperator<WorryType> afterInspectWorryOperation, Function<WorryType, Integer> throwToNextOperation) {
         this.items = new ArrayDeque<>(items);
         this.worryOperation = worryOperation;
         this.afterInspectWorryOperation = afterInspectWorryOperation;
         this.throwToNextOperation = throwToNextOperation;
     }
 
-    public void receiveItem(T item) {
+    public void receiveItem(WorryType item) {
         items.add(item);
     }
 
-    public void registerThrowListener(ThrowListener<T> listener) {
+    public void registerThrowListener(ThrowListener<WorryType> listener) {
         throwListeners.add(listener);
     }
 
@@ -34,24 +34,24 @@ public class Monkey<T extends Number> {
 
     public void playRound() {
         while(items.peek() != null) {
-            T itemWorry = items.poll();
-            T newItemWorry = inspectItem(itemWorry);
+            WorryType itemWorry = items.poll();
+            WorryType newItemWorry = inspectItem(itemWorry);
             newItemWorry = afterInspectWorryOperation.apply(newItemWorry);
             throwItem(newItemWorry);
         }
     }
 
-    private T inspectItem(T itemWorry) {
+    private WorryType inspectItem(WorryType itemWorry) {
         itemInspectCount++;
         return worryOperation.apply(itemWorry);
     }
 
-    private void throwItem(T itemWorry) {
+    private void throwItem(WorryType itemWorry) {
         Integer throwToId = throwToNextOperation.apply(itemWorry);
         throwListeners.forEach(listener -> listener.thrownToMonkey(itemWorry, throwToId));
     }
 
-    public interface ThrowListener<W extends Number> {
+    public interface ThrowListener<W> {
         void thrownToMonkey(W item, Integer monkeyId);
     }
 }
