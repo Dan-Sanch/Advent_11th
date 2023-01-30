@@ -4,25 +4,24 @@ import java.util.function.UnaryOperator;
 public class MonkeyParser {
     private static final UnaryOperator<Integer> AFTER_INSPECT_OP = worry -> worry/3;
 
-    public static Map<Integer, Monkey> parseMonkeys(String[] inputLines) {
-        Map<Integer, Monkey> monkeys = new HashMap<>();
+    public static Map<Integer, Monkey<Integer>> parseMonkeys(String[] inputLines) {
+        Map<Integer, Monkey<Integer>> monkeys = new HashMap<>();
         for (int i=0; i< inputLines.length; i+=7) {
             String[] monkeyBlock = Arrays.copyOfRange(inputLines, i, i+6);
-            AbstractMap.SimpleEntry<Integer, Monkey> idMonkey = parseMonkey(monkeyBlock);
+            AbstractMap.SimpleEntry<Integer, Monkey<Integer>> idMonkey = parseMonkey(monkeyBlock);
             monkeys.put(idMonkey.getKey(), idMonkey.getValue());
         }
 
         return monkeys;
     }
 
-    private static AbstractMap.SimpleEntry<Integer, Monkey> parseMonkey(String[] monkeyBlock) {
+    private static AbstractMap.SimpleEntry<Integer, Monkey<Integer>> parseMonkey(String[] monkeyBlock) {
         int id = parse0(monkeyBlock[0]);
         Queue<Integer> items = parse1(monkeyBlock[1]);
         UnaryOperator<Integer> operation = parse2(monkeyBlock[2]);
         UnaryOperator<Integer> throwNextTest = parseTest(Arrays.copyOfRange(monkeyBlock, 3, 6));
-        UnaryOperator<Integer> afterInspectOp = worry -> worry/3;
 
-        return new AbstractMap.SimpleEntry<>(id, new Monkey(items, operation, AFTER_INSPECT_OP, throwNextTest));
+        return new AbstractMap.SimpleEntry<>(id, new Monkey<>(items, operation, AFTER_INSPECT_OP, throwNextTest));
     }
 
     private static int parse0(String line) {
